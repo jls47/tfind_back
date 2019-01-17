@@ -26,7 +26,8 @@ module.exports = {
 	deletePlayer: deletePlayer,
 	createTO: createTO,
 	editTO: editTO,
-	deleteTO: deleteTO
+	deleteTO: deleteTO,
+	getTsBySearchString: getTsBySearchString
 };
 
 function getAllTournaments(req, res, next){
@@ -43,9 +44,25 @@ function getAllTournaments(req, res, next){
 			return next(err);
 		})
 }
+function getTsBySearchString(req, res, next){
+	let search = req.params.search;
+	console.log(`select * from tournaments where name ilike '%` + search + `%'`)
+	db.any(`select * from tournaments where name ilike '%` + search + `%'`)
+		.then(function (data){
+			res.status(200)
+				.json({
+					status: 'success',
+					data: data,
+					message: 'retrieval successful'
+				});
+		})
+		.catch(function (err){
+			return next(err);
+		})
+}
 function getSingleTournament(req, res, next){
 	let Tid = parseInt(req.params.id);
-	db.any(`select * from tournaments where id = $1`, Tid)
+	db.any(`select * from tournaments where id = ` + Tid)
 		.then(function (data){
 			res.status(200)
 				.json({
@@ -60,7 +77,7 @@ function getSingleTournament(req, res, next){
 }
 function getTsByRegion(req, res, next){
 	let region = req.params.region;
-	db.any(`select * from tournaments where region = $1`, region)
+	db.any(`select * from tournaments where region = `+ region)
 		.then(function (data){
 			res.status(200)
 				.json({
@@ -75,7 +92,7 @@ function getTsByRegion(req, res, next){
 }
 function getTsByGame(req, res, next){
 	let game = req.params.game;
-	db.any(`select * from tournaments where games like '%` + game + `%'`)
+	db.any(`select * from tournaments where games ilike '%` + game + `%'`)
 		.then(function (data){
 			res.status(200)
 				.json({
@@ -90,7 +107,7 @@ function getTsByGame(req, res, next){
 }
 function getTsBySeries(req, res, next){
 	let series = req.params.series;
-	db.any(`select * from tournaments where series like '%` + series + `%'`)
+	db.any(`select * from tournaments where series ilike '%` + series + `%'`)
 		.then(function (data){
 			res.status(200)
 				.json({
