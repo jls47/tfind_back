@@ -197,13 +197,14 @@ function getPlayersByTournament(req, res, next){
 		})
 }
 function createTournament(req, res, next){
-	db.any('insert sql query here')
+	db.none('insert into tournaments(name, region, address, torg, size, entryCond, games, series)' +
+		'values(${name}, ${region}, ${address}, ${torg}, ${size}, ${entryCond}, ${games}, ${series}',
+		req.body)
 		.then(function (data){
 			res.status(200)
 				.json({
 					status: 'success',
-					data: data,
-					message: 'retrieval successful'
+					message: 'Added a tournament!'
 				});
 		})
 		.catch(function (err){
@@ -237,6 +238,9 @@ function deleteTournament(req, res, next){
 		.catch(function (err){
 			return next(err);
 		})
+}
+function addPlayerToTournament(req, res, next){
+
 }
 function createPlayer(req, res, next){
 	db.any('insert sql query here')
