@@ -17,6 +17,7 @@ router.get('/api/tournaments/g/:game', db.getTsByGame);
 router.get('/api/tournaments/s/:series', db.getTsBySeries);
 router.get('/api/tournaments/t/p/:id', db.getPlayersByTournament);
 router.get('/api/tos', db.getAllTOs);
+router.post('/api/tos', db.createTO);
 
 
 module.exports = router;

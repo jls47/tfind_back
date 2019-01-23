@@ -5,7 +5,8 @@ const options = {
 };
 
 const pgp = require('pg-promise')(options);
-const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
+//const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
+const connectionString = 'postgres://tfinder:tfinder@localhost:5432/tournaments'
 const db = pgp(connectionString);
 
 module.exports = {
@@ -197,10 +198,10 @@ function getPlayersByTournament(req, res, next){
 		})
 }
 function createTournament(req, res, next){
-	db.none('insert into tournaments(name, region, address, torg, size, entryCond, games, series)' +
-		'values(${name}, ${region}, ${address}, ${torg}, ${size}, ${entryCond}, ${games}, ${series}',
-		req.body)
-		.then(function (data){
+	console.dir(req.body.games);
+	console.log("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}');");
+	db.none("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}');")
+		.then((data) => {
 			res.status(200)
 				.json({
 					status: 'success',
@@ -212,7 +213,8 @@ function createTournament(req, res, next){
 		})
 }
 function editTournament(req, res, next){
-	db.any('insert sql query here')
+	//Use conditionals to check for updated fields?  Use the sort of scope?
+	db.none('update tournaments set ')
 		.then(function (data){
 			res.status(200)
 				.json({
@@ -285,13 +287,14 @@ function deletePlayer(req, res, next){
 		})
 }
 function createTO(req, res, next){
-	db.any('insert sql query here')
-		.then(function (data){
+	console.dir(req.body);
+	console.log('insert into tos(name, region, contactEmail');
+	db.none('insert into tos(name, region, contactEmail) values ();')
+		.then((data) => {
 			res.status(200)
 				.json({
 					status: 'success',
-					data: data,
-					message: 'retrieval successful'
+					message: 'Added a tournament!'
 				});
 		})
 		.catch(function (err){
