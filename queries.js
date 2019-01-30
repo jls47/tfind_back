@@ -1,12 +1,15 @@
 const promise = require('bluebird');
+const nodemailer = require('nodemailer');
+
+
 
 const options = {
 	promiseLib: promise
 };
 
 const pgp = require('pg-promise')(options);
-const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
-//const connectionString = 'postgres://tfinder:tfinder@localhost:5432/tournaments'
+//const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
+const connectionString = 'postgres://tfinder:tfinder@localhost:5432/tournaments'
 const db = pgp(connectionString);
 
 module.exports = {
@@ -15,21 +18,29 @@ module.exports = {
 	getTsByRegion: getTsByRegion,
 	getTsByGame: getTsByGame,
 	getTsBySeries: getTsBySeries,
-	getAllTOs: getAllTOs,
+	getAllUsers: getAllUsers,
 	getSingleTO: getSingleTO,
 	getPlayersByTournament: getPlayersByTournament,
 	getSinglePlayer: getSinglePlayer,
 	createTournament: createTournament,
 	editTournament: editTournament,
 	deleteTournament: deleteTournament,
-	createPlayer: createPlayer,
-	editPlayer: editPlayer,
-	deletePlayer: deletePlayer,
-	createTO: createTO,
+	createUser: createUser,
+	activateUser: activateUser,
 	editTO: editTO,
 	deleteTO: deleteTO,
 	getTsBySearchString: getTsBySearchString
 };
+
+function makeid() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
 
 function getAllTournaments(req, res, next){
 	db.any('select * from tournaments')
@@ -121,8 +132,8 @@ function getTsBySeries(req, res, next){
 			return next(err);
 		})
 }
-function getAllTOs(req, res, next){
-	db.any('select * from TOs')
+function getAllUsers(req, res, next){
+	db.any('select * from users')
 		.then(function (data){
 			res.status(200)
 				.json({
@@ -244,8 +255,49 @@ function deleteTournament(req, res, next){
 function addPlayerToTournament(req, res, next){
 
 }
-function createPlayer(req, res, next){
-	db.any('insert sql query here')
+function createUser(req, res, next){
+	console.log('aaaa');
+	console.log("insert into users(name, password, torg, region, contactEmail, active) values ('"+req.body.name+"', '"+req.body.password+"', '"+req.body.torg+"', '"
+		+req.body.region+"', '"+req.body.email+"', 'false')");
+	let hash = makeid();
+
+	let transporter = nodemailer.createTransport({
+		host: 'smtp.gmail.com',
+		port: 587,
+		secure: false,
+		auth: {
+			user: 'skateordie72',
+			pass: 'rodneymullen'
+		}
+	});
+
+	transporter.verify(function(error, success){
+		if(error){
+			console.log(error);
+		}else{
+			console.log("Server ready")
+		}
+	});
+
+	let msgToSend = {
+		from: 'skateordie72@gmail.com',
+		to: req.body.email,
+		subject: 'tFind Email Confirmation',
+		text: 'Confirm your email with tFind at www.jlukes.com/tfind_front/confirm/'+hash,
+		html: '<p>Confirm your email with tFind at <a href="www.jlukes.com/tfind_front/confirm/'+hash+'">www.jlukes.com/tfind_front/confirm/'+hash+'</a></p>'
+	}
+
+	transporter.sendMail(msgToSend, function(error, info){
+		if(error){
+			console.log(error)
+		}else{
+			console.log(info.response)
+		}
+	})
+
+	db.any(`insert into users(name, password, torg, region, contactEmail, active)
+		values('`+req.body.name+`', '`+req.body.password+`', '`+req.body.torg+`', '`
+		+req.body.region+`', '`+req.body.email+`', 'false')`)
 		.then(function (data){
 			res.status(200)
 				.json({
@@ -258,44 +310,16 @@ function createPlayer(req, res, next){
 			return next(err);
 		})
 }
-function editPlayer(req, res, next){
-	db.any('insert sql query here')
-		.then(function (data){
+function activateUser(req, res, next){
+	console.log(req.params);
+	break;
+	db.any(`update users set activated = true where hash = `)
+		.then(function(){
 			res.status(200)
 				.json({
 					status: 'success',
-					data: data,
-					message: 'retrieval successful'
-				});
-		})
-		.catch(function (err){
-			return next(err);
-		})
-}
-function deletePlayer(req, res, next){
-	db.any('insert sql query here')
-		.then(function (data){
-			res.status(200)
-				.json({
-					status: 'success',
-					data: data,
-					message: 'retrieval successful'
-				});
-		})
-		.catch(function (err){
-			return next(err);
-		})
-}
-function createTO(req, res, next){
-	console.dir(req.body);
-	console.log('insert into tos(name, region, contactEmail');
-	db.none('insert into tos(name, region, contactEmail) values ();')
-		.then((data) => {
-			res.status(200)
-				.json({
-					status: 'success',
-					message: 'Added a tournament!'
-				});
+					message: 'update successful'
+				})
 		})
 		.catch(function (err){
 			return next(err);
