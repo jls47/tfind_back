@@ -211,7 +211,7 @@ function getPlayersByTournament(req, res, next){
 function createTournament(req, res, next){
 	console.dir(req.body.games);
 	console.log("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}');");
-	db.none("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}');")
+	db.none("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series, active) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}', 'false');")
 		.then((data) => {
 			res.status(200)
 				.json({
@@ -283,8 +283,8 @@ function createUser(req, res, next){
 		from: 'skateordie72@gmail.com',
 		to: req.body.email,
 		subject: 'tFind Email Confirmation',
-		text: 'Confirm your email with tFind at www.jlukes.com/tfind_front/confirm/'+hash,
-		html: '<p>Confirm your email with tFind at <a href="www.jlukes.com/tfind_front/confirm/'+hash+'">www.jlukes.com/tfind_front/confirm/'+hash+'</a></p>'
+		text: 'Confirm your email with tFind at https://www.jlukes.com/tfind_front/activate/'+hash,
+		html: '<p>Confirm your email with tFind at <a href="https://www.jlukes.com/tfind_front/confirm/'+hash+'">https://www.jlukes.com/tfind_front/activate/'+hash+'</a></p>'
 	}
 
 	transporter.sendMail(msgToSend, function(error, info){
@@ -294,10 +294,12 @@ function createUser(req, res, next){
 			console.log(info.response)
 		}
 	})
-
-	db.any(`insert into users(name, password, torg, region, contactEmail, active)
+	console.log(`insert into users(name, password, torg, region, contactEmail, active, hash)
 		values('`+req.body.name+`', '`+req.body.password+`', '`+req.body.torg+`', '`
-		+req.body.region+`', '`+req.body.email+`', 'false')`)
+		+req.body.region+`', '`+req.body.email+`', 'false'`, `'`+ hash + `')`)
+	db.any(`insert into users(name, password, torg, region, contactEmail, active, hash)
+		values('`+req.body.name+`', '`+req.body.password+`', '`+req.body.torg+`', '`
+		+req.body.region+`', '`+req.body.email+`', 'false'` + `, '`+ hash + `')`)
 		.then(function (data){
 			res.status(200)
 				.json({
@@ -311,9 +313,9 @@ function createUser(req, res, next){
 		})
 }
 function activateUser(req, res, next){
-	console.log(req.params);
-	break;
-	db.any(`update users set activated = true where hash = `)
+	console.log(req.body.hash);
+	console.log(`update users set active = true where hash = '` + req.body.hash+`'`)
+	db.any(`update users set active = true where hash = '` + req.body.hash+`'`)
 		.then(function(){
 			res.status(200)
 				.json({

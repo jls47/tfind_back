@@ -18,6 +18,6 @@ router.get('/api/tournaments/s/:series', db.getTsBySeries);
 router.get('/api/tournaments/t/p/:id', db.getPlayersByTournament);
 router.get('/api/users', db.getAllUsers);
 router.post('/api/users', db.createUser);
-router.put('/api/users/:hash', db.activateUser);
+router.put('/api/users', db.activateUser);
 
 module.exports = router;
