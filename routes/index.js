@@ -19,5 +19,6 @@ router.get('/api/tournaments/t/p/:id', db.getPlayersByTournament);
 router.get('/api/users', db.getAllUsers);
 router.post('/api/users', db.createUser);
 router.put('/api/users', db.activateUser);
+router.get('/login', db.login);
 
 module.exports = router;

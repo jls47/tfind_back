@@ -1,6 +1,6 @@
 const promise = require('bluebird');
 const nodemailer = require('nodemailer');
-
+const bcrypt = require('bcrypt');
 
 
 const options = {
@@ -19,9 +19,9 @@ module.exports = {
 	getTsByGame: getTsByGame,
 	getTsBySeries: getTsBySeries,
 	getAllUsers: getAllUsers,
-	getSingleTO: getSingleTO,
+	getSingleUser: getSingleUser,
+	login: login,
 	getPlayersByTournament: getPlayersByTournament,
-	getSinglePlayer: getSinglePlayer,
 	createTournament: createTournament,
 	editTournament: editTournament,
 	deleteTournament: deleteTournament,
@@ -146,7 +146,7 @@ function getAllUsers(req, res, next){
 			return next(err);
 		})
 }
-function getSingleTO(req, res, next){
+function getSingleUser(req, res, next){
 	let id = req.params.id;
 	db.any('insert sql query here')
 		.then(function (data){
@@ -161,16 +161,28 @@ function getSingleTO(req, res, next){
 			return next(err);
 		})
 }
-function getSinglePlayer(req, res, next){
-	let id = req.params.id;
-	db.any('insert sql query here')
+function login(req, res, next){
+	
+	db.any('select * from users where name = $1', req.query.name)
 		.then(function (data){
-			res.status(200)
-				.json({
-					status: 'success',
-					data: data,
-					message: 'retrieval successful'
-				});
+			console.log(data[0].password);
+			bcrypt.compare(req.query.password, data[0].password, function(err, resp){
+				if(resp){
+					console.log('yes')
+					res.status(200)
+						.json({
+							status: 'success',
+							message: 'passwords match'
+						})
+				} else {
+					res.status(200)
+						.json({
+							status: 'failure',
+							message: `passwords don't match`
+						})
+				}
+
+			})
 		})
 		.catch(function (err){
 			return next(err);
@@ -261,6 +273,8 @@ function createUser(req, res, next){
 		+req.body.region+"', '"+req.body.email+"', 'false')");
 	let hash = makeid();
 
+
+
 	let transporter = nodemailer.createTransport({
 		host: 'smtp.gmail.com',
 		port: 587,
@@ -297,20 +311,26 @@ function createUser(req, res, next){
 	console.log(`insert into users(name, password, torg, region, contactEmail, active, hash)
 		values('`+req.body.name+`', '`+req.body.password+`', '`+req.body.torg+`', '`
 		+req.body.region+`', '`+req.body.email+`', 'false'`, `'`+ hash + `')`)
-	db.any(`insert into users(name, password, torg, region, contactEmail, active, hash)
-		values('`+req.body.name+`', '`+req.body.password+`', '`+req.body.torg+`', '`
-		+req.body.region+`', '`+req.body.email+`', 'false'` + `, '`+ hash + `')`)
-		.then(function (data){
-			res.status(200)
-				.json({
-					status: 'success',
-					data: data,
-					message: 'retrieval successful'
-				});
-		})
-		.catch(function (err){
-			return next(err);
-		})
+	bcrypt.genSalt(10, function(err, salt){
+		bcrypt.hash(req.body.password, salt, function(err, hashpass){
+			console.log(hashpass + 'aaaa');
+			db.any(`insert into users(name, password, torg, region, contactEmail, active, hash)
+			values('`+req.body.name+`', '`+hashpass+`', '`+req.body.torg+`', '`
+			+req.body.region+`', '`+req.body.email+`', 'false'` + `, '`+ hash + `')`)
+				.then(function (data){
+					res.status(200)
+						.json({
+							status: 'success',
+							data: data,
+							message: 'retrieval successful'
+						});
+				})
+				.catch(function (err){
+					return next(err);
+				})
+
+		});
+	});
 }
 function activateUser(req, res, next){
 	console.log(req.body.hash);
