@@ -8,8 +8,8 @@ const options = {
 };
 
 const pgp = require('pg-promise')(options);
-//const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
-const connectionString = 'postgres://tfinder:tfinder@localhost:5432/tournaments'
+const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
+//const connectionString = 'postgres://tfinder:tfinder@localhost:5432/tournaments'
 const db = pgp(connectionString);
 
 module.exports = {
