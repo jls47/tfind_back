@@ -222,8 +222,8 @@ function getPlayersByTournament(req, res, next){
 }
 function createTournament(req, res, next){
 	console.dir(req.body.games);
-	console.log("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}');");
-	db.none("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series, active) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}', 'false');")
+	console.log("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series, lat, lng) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}');");
+	db.none("insert into tournaments(name, region, address, TOrg, size, entryCond, games, series, active, lat, lng) values('"+req.body.name+"', '"+req.body.region+"', '"+req.body.address+"', '"+req.body.torg+"', '"+req.body.size+"', '"+req.body.entrycond+"', '{"+req.body.games+"}', '{"+req.body.series+"}', 'false', "+req.body.lat+", "+req.body.lng+");")
 		.then((data) => {
 			res.status(200)
 				.json({
