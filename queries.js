@@ -64,8 +64,8 @@ function getTsByCoords(req, res, next){
 	let NE = JSON.parse(req.query.NE);
 	console.log(SW);
 	console.log(NE);
-	console.log('select * from tournaments where (lat between ' + NE.lat + ' and ' + SW.lat + ') and (lng between ' + NE.lng + ' and ' + SW.lng + ');')
-	db.any('select * from tournaments where (lat between ' + NE.lat + ' and ' + SW.lat + ') and (lng between ' + NE.lng + ' and ' + SW.lng + ');')
+	console.log('select * from tournaments where (lat between ' + SW.lat + ' and ' + NE.lat + ') and (lng between ' + SW.lng + ' and ' + NE.lng + ');')
+	db.any('select * from tournaments where (lat between ' + SW.lat + ' and ' + NE.lat + ') and (lng between ' + SW.lng + ' and ' + NE.lng + ');')
 		.then(function (data){
 			res.status(200)
 				.json({
