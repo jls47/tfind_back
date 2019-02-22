@@ -9,6 +9,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/api/tournaments', db.getAllTournaments);
+router.get('/api/tournaments/coords', db.getTsByCoords);
 router.post('/api/tournaments', db.createTournament);
 router.get('/api/tournaments/:id', db.getSingleTournament);
 router.get('/api/tournaments/search/:search', db.getTsBySearchString);

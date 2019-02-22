@@ -29,7 +29,8 @@ module.exports = {
 	activateUser: activateUser,
 	editTO: editTO,
 	deleteTO: deleteTO,
-	getTsBySearchString: getTsBySearchString
+	getTsBySearchString: getTsBySearchString,
+	getTsByCoords: getTsByCoords
 };
 
 function makeid() {
@@ -41,9 +42,30 @@ function makeid() {
 
   return text;
 }
-
 function getAllTournaments(req, res, next){
-	db.any('select * from tournaments')
+	console.log(req.body);
+	console.log(req.params);
+	db.any(`select * from tournaments`)
+		.then(function (data){
+			res.status(200)
+				.json({
+					status: 'success',
+					data: data,
+					message: 'retrieval successful'
+				});
+		})
+		.catch(function (err){
+			return next(err);
+		})
+}
+//Getting the coordinates - sort coordinates between the two points
+function getTsByCoords(req, res, next){
+	let SW = JSON.parse(req.query.SW);
+	let NE = JSON.parse(req.query.NE);
+	console.log(SW);
+	console.log(NE);
+	console.log('select * from tournaments where (lat between ' + NE.lat + ' and ' + SW.lat + ') and (lng between ' + NE.lng + ' and ' + SW.lng + ');')
+	db.any('select * from tournaments where (lat between ' + NE.lat + ' and ' + SW.lat + ') and (lng between ' + NE.lng + ' and ' + SW.lng + ');')
 		.then(function (data){
 			res.status(200)
 				.json({
