@@ -184,8 +184,9 @@ function getSingleUser(req, res, next){
 		})
 }
 function login(req, res, next){
-	
-	db.any('select * from users where name = $1', req.query.name)
+	console.log(req);
+	console.log(`select * from users where name = '` + req.query.name + `'`);
+	db.any(`select * from users where name = '` + req.query.name + `'`)
 		.then(function (data){
 			console.log(data[0].password);
 			bcrypt.compare(req.query.password, data[0].password, function(err, resp){
@@ -194,7 +195,8 @@ function login(req, res, next){
 					res.status(200)
 						.json({
 							status: 'success',
-							message: 'passwords match'
+							message: 'passwords match',
+							user: data
 						})
 				} else {
 					res.status(200)
