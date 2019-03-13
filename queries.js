@@ -300,13 +300,16 @@ function createUser(req, res, next){
 
 
 	let transporter = nodemailer.createTransport({
-		host: 'smtp.gmail.com',
-		port: 587,
+		host: 'smtp.mail.yahoo.com',
+		port: 465,
+		service: 'yahoo',
 		secure: false,
 		auth: {
-			user: 'skateordie72',
-			pass: 'rodneymullen'
-		}
+			user: 'tfindtest@yahoo.com',
+			pass: 'f3#Lgood'
+		},
+		debug: false,
+		logger: true
 	});
 
 	transporter.verify(function(error, success){
@@ -318,11 +321,11 @@ function createUser(req, res, next){
 	});
 
 	let msgToSend = {
-		from: 'skateordie72@gmail.com',
+		from: 'tfindtest@yahoo.com',
 		to: req.body.email,
 		subject: 'tFind Email Confirmation',
-		text: 'Confirm your email with tFind at https://www.jlukes.com/tfind_front/activate/'+hash,
-		html: '<p>Confirm your email with tFind at <a href="https://www.jlukes.com/tfind_front/#/confirm/'+hash+'">https://www.jlukes.com/tfind_front/#/activate/'+hash+'</a></p>'
+		text: 'Confirm your email with tFind at https://www.jlukes.com/tfind_front/#/activate/'+hash,
+		html: '<p>Confirm your email with tFind at <a href="https://www.jlukes.com/tfind_front/#/activate/'+hash+'">https://www.jlukes.com/tfind_front/#/activate/'+hash+'</a></p>'
 	}
 
 	transporter.sendMail(msgToSend, function(error, info){
