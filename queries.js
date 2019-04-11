@@ -8,8 +8,8 @@ const options = {
 };
 
 const pgp = require('pg-promise')(options);
-const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
-//const connectionString = 'postgres://tfinder:tfinder@localhost:5432/tournaments'
+//const connectionString = 'postgres://obxjrzvvlumujf:e234770719c12e272568673d3e8621c46c0eba3783475121e696b657849fd674@ec2-54-243-228-140.compute-1.amazonaws.com:5432/d8lau1peg9l8rf';
+const connectionString = 'postgres://tfinder:tfinder@localhost:5432/tournaments'
 const db = pgp(connectionString);
 
 module.exports = {
@@ -27,8 +27,6 @@ module.exports = {
 	deleteTournament: deleteTournament,
 	createUser: createUser,
 	activateUser: activateUser,
-	editTO: editTO,
-	deleteTO: deleteTO,
 	getTsBySearchString: getTsBySearchString,
 	getTsByCoords: getTsByCoords
 };
@@ -178,35 +176,6 @@ function getSingleUser(req, res, next){
 					data: data,
 					message: 'retrieval successful'
 				});
-		})
-		.catch(function (err){
-			return next(err);
-		})
-}
-function login(req, res, next){
-	console.log(req);
-	console.log(`select * from users where name = '` + req.query.name + `'`);
-	db.any(`select * from users where name = '` + req.query.name + `'`)
-		.then(function (data){
-			console.log(data[0].password);
-			bcrypt.compare(req.query.password, data[0].password, function(err, resp){
-				if(resp){
-					console.log('yes')
-					res.status(200)
-						.json({
-							status: 'success',
-							message: 'passwords match',
-							user: data
-						})
-				} else {
-					res.status(200)
-						.json({
-							status: 'failure',
-							message: `passwords don't match`
-						})
-				}
-
-			})
 		})
 		.catch(function (err){
 			return next(err);
@@ -374,29 +343,34 @@ function activateUser(req, res, next){
 			return next(err);
 		})
 }
-function editTO(req, res, next){
-	db.any('insert sql query here')
+function login(req, res, next){
+	console.log(req);
+	console.log(`select * from users where name = '` + req.query.name + `'`);
+	db.any(`select * from users where name = '` + req.query.name + `'`)
 		.then(function (data){
-			res.status(200)
-				.json({
-					status: 'success',
-					data: data,
-					message: 'retrieval successful'
-				});
-		})
-		.catch(function (err){
-			return next(err);
-		})
-}
-function deleteTO(req, res, next){
-	db.any('insert sql query here')
-		.then(function (data){
-			res.status(200)
-				.json({
-					status: 'success',
-					data: data,
-					message: 'retrieval successful'
-				});
+			console.log(data);
+			bcrypt.compare(req.query.password, data[0].password, function(err, resp){
+				if(resp){
+					res.status(200)
+						.json({
+							status: 'success',
+							message: 'passwords match',
+							user: {
+								name: data[0].name,
+								torg: data[0].torg,
+								region: data[0].region,
+								active: data[0].active
+							}
+						})
+				} else {
+					res.status(200)
+						.json({
+							status: 'failure',
+							message: `passwords don't match`
+						})
+				}
+
+			})
 		})
 		.catch(function (err){
 			return next(err);
